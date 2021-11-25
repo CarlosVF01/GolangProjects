@@ -1,5 +1,9 @@
-# Go-Projects (24-11-2021)
+# GoApiRest (25-11-2021)
 
-Repository where I will add the Go projects I do in my free time to learn about it
+Employees (with name and age only) ApiRest made with Golang.
 
-Currently there's a WIP ApiRest
+Currently there's 3 GET methods:
+
+- GetEmployeesByName /employees/{name}
+- GetEmployeesById /employees/{id}
+- GetAllEmployees /employees
