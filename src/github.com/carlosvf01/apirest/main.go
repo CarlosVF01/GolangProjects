@@ -25,16 +25,16 @@ func main() {
 }
 // Function that handles the endpoints that are accessible
 func handleRequests() {
-	router := mux.NewRouter().StrictSlash(true)
-	router.Headers().HeadersRegexp("Content-Type", "application/(text|json)")
+	router := mux.NewRouter()
 
-	router.HandleFunc("/employees/{name:[a-zA-Z]+}", EmployeeByNameHandler).Methods("GET")
-	router.HandleFunc("/employees/{id:[0-9]+}", EmployeeByIdHandler).Methods("GET")
+	router.HandleFunc("/employees/{name:[a-zA-Z]+}", GetEmployeeByNameHandler).Methods("GET")
+	router.HandleFunc("/employees/{id:[0-9]+}", GetEmployeeByIdHandler).Methods("GET")
 	router.HandleFunc("/employees", GetAllEmployeesHandler).Methods("GET")
+	router.HandleFunc("/employees/add", PostNewEmployeeHandler).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
-func EmployeeByIdHandler(w http.ResponseWriter, r *http.Request)  {
+func GetEmployeeByIdHandler(w http.ResponseWriter, r *http.Request)  {
 	vars := mux.Vars(r)
 	fmt.Println("Endpoint Hit: GetEmployeeById")
 	id, _ := strconv.ParseInt(vars["id"], 10, 32)
@@ -50,7 +50,7 @@ func GetAllEmployeesHandler(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(employees)
 }
-func EmployeeByNameHandler(w http.ResponseWriter, r *http.Request) {
+func GetEmployeeByNameHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	fmt.Println("Endpoint Hit: GetEmployeeByName")
 
@@ -61,7 +61,36 @@ func EmployeeByNameHandler(w http.ResponseWriter, r *http.Request) {
 
 
 }
-// Function that queries for employees that have the specified name
+func PostNewEmployeeHandler(w http.ResponseWriter, r *http.Request){
+	var employee Employee
+	fmt.Println("Endpoint Hit: PostNewEmployee")
+
+	dec := json.NewDecoder(r.Body)
+	dec.Decode(&employee)
+
+	employee = PostNewEmployeeQuery(employee)
+
+	json.NewEncoder(w).Encode(employee)
+
+}
+func PostNewEmployeeQuery(employee Employee) Employee{
+	rows, err := db.Query("INSERT INTO emp (name, age) VALUES(?, ?)", employee.Name, employee.Age)
+
+	if err != nil{
+		fmt.Println(err)
+	}
+
+	defer rows.Close()
+
+
+	for rows.Next() {
+		var employeeOnDb Employee
+		rows.Scan(&employeeOnDb.ID, &employeeOnDb.Name, &employeeOnDb.Age)
+		employee = employeeOnDb
+	}
+
+	return employee
+}
 func GetEmployeesByNameQuery(name string) []Employee {
 	// An employees slice to hold data from returned rows.
 	var employees []Employee

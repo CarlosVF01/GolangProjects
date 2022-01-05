@@ -1,9 +1,3 @@
-# GoApiRest (25-11-2021)
+# GoProjects
 
-Employees (with name and age only) ApiRest made with Golang.
-
-Currently there's 3 GET methods:
-
-- GetEmployeesByName /employees/{name}
-- GetEmployeesById /employees/{id}
-- GetAllEmployees /employees
+Directory where I add all the Golang programs I make for learning, including course exercises.
